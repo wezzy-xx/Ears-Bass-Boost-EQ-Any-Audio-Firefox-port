@@ -43,3 +43,44 @@ popup.css         Стили попапа (перенесено из ориги�
 snap.svg-min.js   Snap.svg 0.4.1 (Adobe, Apache-2.0), без изменений, рисует график EQ
 ears*.png         Иконки (перенесено из оригинала — не менялось)
 ```
+
+-- What the Extension Does
+Ears lets you equalize the audio of any browser tab in real time: boost the bass, tame harsh high frequencies, bring vocals forward—and visualize the frequency spectrum of what you are listening to. It uses Web Audio API biquad filters (shelving + peaking) controlled via draggable nodes on an interactive graph, along with preset saving and one-click Bass Boost.
+
+-- Installation
+Download the `.xpi` file from the Releases page and drag and drop it into a Firefox window.
+
+-- Required Permissions
+Ears needs access to the pages whose audio you want to modify. In Firefox, the "Access your data for all websites" permission may not be granted automatically. If the audio does not change on websites with custom players (such as Yandex Music, Spotify, or SoundCloud):
+1. Open `about:addons` → **Ears** → **Permissions**.
+2. Enable **Access your data for all websites**.
+3. Reload the tab playing audio.
+
+-- How to Use
+Open the tab whose audio you want to equalize, start playback, click the Ears icon, and click **EQ Current Tab**. Drag the nodes on the graph to shape the equalizer curve; hold **Shift + drag** up or down on a node to adjust the filter bandwidth (Q). On the left, there is a master volume slider. Save your settings as a named preset or use the built-in **Bass Boost**. Toggle the **Spectrum Visualizer** to see the real-time frequency breakdown of the audio. 
+
+If nothing happens, click anywhere on the page (the browser blocks audio processing until the first user interaction) and open the developer console (`F12`): log lines starting with `[Ears` explain what was skipped and why.
+
+-- How This Port Differs from the Chrome Version
+Firefox does not support `chrome.tabCapture` or the `offscreen` API, so a tab's audio stream cannot be captured from the extension side. Instead, the audio engine runs directly inside the webpage:
+* **`manifest.json`** — Manifest V3 for Firefox: uses `background.scripts` (event page) instead of a service worker, `browser_specific_settings.gecko` (extension ID, minimum Firefox versions, data collection declaration), and a `document_start` content script injected into the page's execution context (`"world": "MAIN"`).
+* **`bg.js`** — Background event page. Stores state (filters, volume, presets, and the list of active tabs in `browser.storage`), injects scripts into the tab when **EQ Current Tab** is clicked, and forwards changes from the popup to the tab.
+* **`main.js`** — Audio engine running in the page's JS world. For pages using their own Web Audio, it routes everything sent to the context destination through a chain of 11 biquad filters; standard `<audio>`/`<video>` elements (including detached ones not added to the DOM, such as `new Audio()`) are routed through its own `AudioContext`. The spectrum analyzer also lives here.
+* **`content.js`** — A lightweight bridge between the extension and `main.js`.
+* **`ff-shim.js`** — Firefox automatically closes extension popups when a file picker dialog opens, so **Import Presets** opens the popup in a full browser tab instead.
+* **`popup.js` / `popup.html`** — Virtually unchanged (`popup.js` was only formatted with Prettier).
+
+-- Repository Structure
+
+| File | Description |
+| :--- | :--- |
+| `manifest.json` | MV3 manifest for Firefox |
+| `bg.js` | Event page: storage, presets, tabs, and script injection |
+| `main.js` | Audio engine in the page world: EQ chain, Web Audio interception, and media element handling |
+| `content.js` | Bridge between the extension and `main.js` |
+| `ff-shim.js` | Workaround for Firefox popup closing limitation (Import Presets) |
+| `popup.html` | Popup UI markup |
+| `popup.js` | Popup logic (EQ graph rendering, node dragging, and messaging) |
+| `popup.css` | Popup styles (ported from the original — unchanged) |
+| `snap.svg-min.js` | Snap.svg 0.4.1 (Adobe, Apache-2.0), unchanged, renders the EQ graph |
+| `ears*.png` | Icons (ported from the original — unchanged) |

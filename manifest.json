@@ -1,0 +1,64 @@
+{
+   "manifest_version": 3,
+   "author": "Kevin King",
+   "name": "Ears: Bass Boost, EQ Any Audio!",
+   "short_name": "Ears",
+   "version": "1.3.14",
+   "description": "EQ any audio you find on the web, live! Crank the bass, dim the highs, up the vocals: all with Ears!",
+   "icons": {
+      "16": "ears16.png",
+      "32": "ears32.png",
+      "48": "ears48.png",
+      "64": "ears64.png",
+      "128": "ears128.png"
+   },
+   "browser_specific_settings": {
+      "gecko": {
+         "id": "ears-firefox@wezzyxx.github.io",
+         "strict_min_version": "140.0",
+         "data_collection_permissions": {
+            "required": [
+               "none"
+            ]
+         }
+      },
+      "gecko_android": {
+         "strict_min_version": "142.0"
+      }
+   },
+   "action": {
+      "default_icon": "ears128.png",
+      "default_popup": "popup.html"
+   },
+   "background": {
+      "scripts": [
+         "bg.js"
+      ]
+   },
+   "permissions": [
+      "activeTab",
+      "scripting",
+      "tabs",
+      "storage",
+      "downloads"
+   ],
+   "content_security_policy": {
+      "extension_pages": "script-src 'self'; object-src 'self'"
+   },
+   "host_permissions": [
+      "<all_urls>"
+   ],
+   "content_scripts": [
+      {
+         "matches": [
+            "<all_urls>"
+         ],
+         "js": [
+            "main.js"
+         ],
+         "run_at": "document_start",
+         "all_frames": true,
+         "world": "MAIN"
+      }
+   ]
+}

@@ -1,7 +1,7 @@
 # Ears-Bass-Boost-EQ-Any-Audio-Firefox-port
 This is an unofficial community port of **[Ears: Bass Boost, EQ Any Audio!](https://chrome.google.com/webstore/detail/ears-audio-toolkit/nfdfiepdkbnoanddpianalelglmfooik)** by Kevin King to **Firefox**. It is based on a community fork of the Chrome extension.
 
--- Что делает расширение
+-- Что делает расширение \n
 Ears позволяет в реальном времени эквализировать звук любой вкладки браузера: поднять бас, приглушить резкие высокие частоты, вывести вокал вперёд — и увидеть спектр частот того, что вы слушаете. Используются биквадратные фильтры Web Audio API (полочные + пиковые), которыми управляют перетаскиваемые точки на интерактивном графике, плюс сохранение пресетов и Bass Boost в один клик.
 
 -- Установка

@@ -1,15 +1,45 @@
 # Ears-Bass-Boost-EQ-Any-Audio-Firefox-port
 This is an unofficial community port of **[Ears: Bass Boost, EQ Any Audio!](https://chrome.google.com/webstore/detail/ears-audio-toolkit/nfdfiepdkbnoanddpianalelglmfooik)** by Kevin King to **Firefox**. It is based on a community fork of the Chrome extension.
-Структура репозитория // Repository layout
+
+-- Что делает расширение
+Ears позволяет в реальном времени эквализировать звук любой вкладки браузера: поднять бас, приглушить резкие высокие частоты, вывести вокал вперёд — и увидеть спектр частот того, что вы слушаете. Используются биквадратные фильтры Web Audio API (полочные + пиковые), которыми управляют перетаскиваемые точки на интерактивном графике, плюс сохранение пресетов и Bass Boost в один клик.
+
+-- Установка
+скачайте `.xpi` на странице Releases и перетащите его в окно Firefox.
+
+-- Нужное разрешение
+Ears должен иметь доступ к страницам, звук которых вы хотите менять. В Firefox разрешение «доступ ко всем сайтам» может не выдаваться автоматически. Если звук не меняется на сайтах со своим плеером (например, Яндекс Музыка, Spotify, SoundCloud):
+Откройте `about:addons` → Ears → Разрешения.
+Включите Доступ к вашим данным на всех сайтах.
+Перезагрузите вкладку со звуком.
+
+-- Как пользоваться
+Откройте вкладку, звук которой хотите эквализировать, включите воспроизведение, нажмите иконку Ears и кликните EQ Current Tab.
+Перетаскивайте точки на графике, чтобы менять форму эквалайзера; shift + перетаскивание точки вверх/вниз меняет ширину фильтра (Q).
+Слева — ползунок общей громкости.
+Сохраняйте настройки как именованный пресет или используйте готовый Bass Boost.
+Переключайте Spectrum Visualizer, чтобы видеть частотный состав звука в реальном времени.
+Если ничего не происходит, кликните в любое место страницы (браузер не даёт обрабатывать звук до первого клика) и откройте консоль (F12): строки, начинающиеся с `[Ears`, объясняют, что было пропущено и почему.
+
+-- Чем порт отличается от Chrome-версии
+В Firefox нет `chrome.tabCapture` и API `offscreen`, поэтому перехватить аудиопоток вкладки со стороны расширения нельзя. Вместо этого аудио-движок работает внутри страницы:
+`manifest.json` — Manifest V3 для Firefox: `background.scripts` (event page) вместо service worker, `browser_specific_settings.gecko` (ID, минимальные версии, декларация о сборе данных), скрипт `document_start` в «мире» самой страницы (`"world": "MAIN"`).
+`bg.js` — фоновая event-страница. Хранит состояние (фильтры, громкость, пресеты, список активных вкладок в `browser.storage`), внедряет скрипты во вкладку по кнопке EQ Current Tab и пересылает изменения из попапа во вкладку.
+`main.js` — аудио-движок в JS-мире страницы. Для страниц со своим Web Audio он перенаправляет всё, что идёт на выход контекста, через цепочку из 11 биквадратных фильтров; обычные `<audio>`/`<video>` (в том числе не добавленные на страницу, вроде `new Audio()`) направляет через собственный `AudioContext`. Здесь же живёт анализатор спектра.
+`content.js` — небольшой мост между расширением и `main.js`.
+`ff-shim.js` — Firefox закрывает попап, когда открывается окно выбора файла, поэтому Import Presets открывает попап в полной вкладке.
+`popup.js` / `popup.html` — практически без изменений (`popup.js` только отформатирован через Prettier).
+
+-- Структура репозитория
 ```
-manifest.json     Манифест MV3 для Firefox // Firefox MV3 manifest
-bg.js             Event page: хранилище, пресеты, вкладки, внедрение скриптов // Event page: storage, presets, tabs, script injection
-main.js           Аудио-движок в мире страницы: цепочка EQ, перехват Web Audio, работа с media-элементами // Audio engine in the page's world: EQ chain, Web Audio interception, media hooking
-content.js        Мост между расширением и main.js // Bridge between the extension and main.js
-ff-shim.js        Обход ограничения Firefox для попапа (Import Presets) // Firefox popup workaround (Import Presets)
-popup.html        Разметка интерфейса попапа // Popup UI markup
-popup.js          Логика попапа (отрисовка графика EQ, перетаскивание, обмен сообщениями) // Popup UI logic (EQ graph rendering, drag handling, messaging)
-popup.css         Стили попапа (перенесено из оригинала — не менялось) // Popup styling  (carried over from the original — not modified)
-snap.svg-min.js   Snap.svg 0.4.1 (Adobe, Apache-2.0), без изменений, рисует график EQ // Snap.svg 0.4.1 (Adobe, Apache-2.0), unmodified, draws the EQ graph
-ears*.png         Иконки (перенесено из оригинала — не менялось) // Toolbar/store icons  (carried over from the original — not modified)
+manifest.json     Манифест MV3 для Firefox
+bg.js             Event page: хранилище, пресеты, вкладки, внедрение скриптов
+main.js           Аудио-движок в мире страницы: цепочка EQ, перехват Web Audio, работа с media-элементами
+content.js        Мост между расширением и main.js
+ff-shim.js        Обход ограничения Firefox для попапа (Import Presets)
+popup.html        Разметка интерфейса попапа
+popup.js          Логика попапа (отрисовка графика EQ, перетаскивание, обмен сообщениями)
+popup.css         Стили попапа (перенесено из оригинала — не менялось)
+snap.svg-min.js   Snap.svg 0.4.1 (Adobe, Apache-2.0), без изменений, рисует график EQ
+ears*.png         Иконки (перенесено из оригинала — не менялось)
 ```

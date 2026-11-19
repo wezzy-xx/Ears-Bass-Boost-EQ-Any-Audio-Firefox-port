@@ -31,18 +31,20 @@ Ears должен иметь доступ к страницам, звук кот
 `popup.js` / `popup.html` — практически без изменений (`popup.js` только отформатирован через Prettier).
 
 -- Структура репозитория      
-```
-manifest.json     Манифест MV3 для Firefox
-bg.js             Event page: хранилище, пресеты, вкладки, внедрение скриптов
-main.js           Аудио-движок в мире страницы: цепочка EQ, перехват Web Audio, работа с media-элементами
-content.js        Мост между расширением и main.js
-ff-shim.js        Обход ограничения Firefox для попапа (Import Presets)
-popup.html        Разметка интерфейса попапа
-popup.js          Логика попапа (отрисовка графика EQ, перетаскивание, обмен сообщениями)
-popup.css         Стили попапа (перенесено из оригинала — не менялось)
-snap.svg-min.js   Snap.svg 0.4.1 (Adobe, Apache-2.0), без изменений, рисует график EQ
-ears*.png         Иконки (перенесено из оригинала — не менялось)
-```
+
+| File | Description |
+| :--- | :--- |
+| `manifest.json` | Манифест MV3 для Firefox |
+| `bg.js` | Event page: хранилище, пресеты, вкладки, внедрение скриптов |
+| `main.js` | Аудио-движок в мире страницы: цепочка EQ, перехват Web Audio, работа с media-элементами |
+| `content.js` | Мост между расширением и main.js |
+| `ff-shim.js` | Обход ограничения Firefox для попапа (Import Presets) |
+| `popup.html` | Разметка интерфейса попапа |
+| `popup.js` | Логика попапа (отрисовка графика EQ, перетаскивание, обмен сообщениями) |
+| `popup.css` | Стили попапа (перенесено из оригинала — не менялось) |
+| `snap.svg-min.js` | Snap.svg 0.4.1 (Adobe, Apache-2.0), без изменений, рисует график EQ |
+| `ears*.png` | Иконки (перенесено из оригинала — не менялось) |
+
 
 -- What the Extension Does
 Ears lets you equalize the audio of any browser tab in real time: boost the bass, tame harsh high frequencies, bring vocals forward—and visualize the frequency spectrum of what you are listening to. It uses Web Audio API biquad filters (shelving + peaking) controlled via draggable nodes on an interactive graph, along with preset saving and one-click Bass Boost.
